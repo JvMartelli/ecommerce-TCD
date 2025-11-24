@@ -2,6 +2,8 @@ import type { ColumnDef } from "@tanstack/react-table";
 import type { BrandDTO } from "../../dtos/brand.dto";
 import { DataTableAction } from "@/components/layout/data-table-actions";
 
+
+
 export const brandColumns: ColumnDef<BrandDTO>[] = [
     {
         accessorKey: 'id',
