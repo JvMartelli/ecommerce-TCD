@@ -4,7 +4,6 @@ import { useProduct, useCreateProduct, useDeleteProduct, useUpdateProduct } from
 import { Input } from "@/components/ui/input";
 import type { ProductDTO } from "../dtos/product.dto";
 import { Textarea } from "@/components/ui/textarea";
-
 import { z } from "zod"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -18,26 +17,24 @@ import { TabsContent } from "@radix-ui/react-tabs";
 import { SidebarForm } from "../../../components/layout/sidebar-form";
 
 const formSchema = z.object({
-  name: z.string().min(2, "Informe pelo menos 2 caracteres").max(100, "Máx. 100 caracteres"),
+  name: z.string().min(2).max(100),
   description: z.string().optional(),
   price: z.coerce.number(),
   active: z.boolean(),
-  categoryId: z.string().min(1, "Selecione uma categoria"),
+  categoryId: z.string().min(1),
   brandId: z.string().optional(),
+  imageUrl: z.string().url()
 });
 
 export function ProductForm() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { data, isLoading } = useProduct(id ?? "");
-
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
-
   const { data: categories = [] } = useCategories();
   const { data: brands = [] } = useBrands();
-
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,10 +46,10 @@ export function ProductForm() {
       active: true,
       categoryId: "",
       brandId: "",
+      imageUrl: ""
     },
   });
 
-  // Preenche o form ao editar
   useEffect(() => {
     if (data) {
       form.reset({
@@ -62,6 +59,7 @@ export function ProductForm() {
         active: data.active ?? true,
         categoryId: data.category?.id ?? "",
         brandId: data.brand?.id ?? "",
+        imageUrl: data.imageUrl ?? ""
       });
     }
   }, [data, form]);
@@ -75,7 +73,7 @@ export function ProductForm() {
         setLoading(false);
       },
     });
-  };
+  }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
@@ -85,6 +83,7 @@ export function ProductForm() {
       description: values.description,
       price: values.price,
       active: values.active,
+      imageUrl: values.imageUrl,
       category: { id: values.categoryId, name: "" },
       brand: values.brandId ? { id: values.brandId, name: "" } : undefined,
     };
@@ -107,7 +106,7 @@ export function ProductForm() {
         },
       });
     }
-  };
+  }
 
   return (
     <SidebarForm
@@ -124,6 +123,7 @@ export function ProductForm() {
               <TabsTrigger value="description">Descrição</TabsTrigger>
             </TabsList>
             <TabsContent value="geral" className="space-y-5">
+
               <FormField
                 control={form.control}
                 name="name"
@@ -137,6 +137,21 @@ export function ProductForm() {
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="imageUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Imagem (URL)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://site.com/imagem.png" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="categoryId"
@@ -164,6 +179,7 @@ export function ProductForm() {
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="brandId"
@@ -191,6 +207,7 @@ export function ProductForm() {
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="price"
@@ -204,21 +221,22 @@ export function ProductForm() {
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="active"
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                    <div className="space-y-0.5">
-                      <FormLabel>Produto Ativo</FormLabel>
-                    </div>
+                    <FormLabel>Produto Ativo</FormLabel>
                     <FormControl>
                       <Switch checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                   </FormItem>
                 )}
               />
+
             </TabsContent>
+
             <TabsContent value="description" className="space-y-5">
               <FormField
                 control={form.control}
@@ -234,6 +252,7 @@ export function ProductForm() {
                 )}
               />
             </TabsContent>
+
           </Tabs>
         </form>
       </Form>

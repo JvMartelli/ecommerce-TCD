@@ -13,7 +13,6 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { ShoppingCart } from "lucide-react"
-import { url } from "zod"
 
 // This is sample data.
 const data = {

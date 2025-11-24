@@ -7,6 +7,7 @@ export interface ProductDTO {
   description?: string;
   price: number;
   active: boolean;
+  imageUrl?: string;
   category: CategoryDTO;
   brand?: BrandDTO;
 }

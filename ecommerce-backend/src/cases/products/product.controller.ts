@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Par
 import { Product } from "./product.entity";
 import { ProductService } from "./product.service";
 
-@Controller('categories')
+@Controller('products')
 export class ProductController {
 
     constructor(private readonly service: ProductService) {}
