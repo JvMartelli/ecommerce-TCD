@@ -10,11 +10,14 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { FormControl, Form, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { useCategories } from "@/cases/categories/hooks/use-category"
-import { useBrands } from "@/cases/brands/hooks/use-brand"
+
+
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TabsContent } from "@radix-ui/react-tabs"
-import { SidebarForm } from "../../../components/layout/sidebar-form"
+import { useCategories } from "../../categories/hooks/use-category"
+import { useBrands } from "../../brands/hooks/use-brand"
+import { SidebarForm } from "@/components/layout/sidebar-form"
+
 
 const formSchema = z.object({
   name: z.string().min(2).max(100),

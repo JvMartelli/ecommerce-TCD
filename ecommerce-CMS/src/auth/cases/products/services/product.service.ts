@@ -1,4 +1,4 @@
-import { api } from "../../../lib/axios";
+import { api } from "@/lib/axios";
 import type { ProductDTO } from "../dtos/product.dto";
 
 const _ENDPOINT = '/products';
