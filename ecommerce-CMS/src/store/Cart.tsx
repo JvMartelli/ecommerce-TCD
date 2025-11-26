@@ -1,88 +1,87 @@
-import { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
+import { useEffect, useState } from "react";
+import { useCart } from "@/hooks/useCart";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Cart() {
-  const [items, setItems] = useState<any[]>([])
+  const cart = useCart();
+  const navigate = useNavigate();
+  const [localItems, setLocalItems] = useState<any[]>([]);
 
   useEffect(() => {
-    setItems(JSON.parse(localStorage.getItem("cart") || "[]"))
-  }, [])
+    setLocalItems(cart.items);
+  }, [cart.items]);
 
-  function updateQty(id: string, qty: number) {
-    const list = items.map(item =>
-      item.id === id ? { ...item, qty: Number(qty) } : item
-    )
-    setItems(list)
-    localStorage.setItem("cart", JSON.stringify(list))
+  function inc(id: string) {
+    const it = localItems.find((i) => i.id === id);
+    if (!it) return;
+    cart.update(id, it.quantity + 1);
   }
 
-  function removeItem(id: string) {
-    const list = items.filter(item => item.id !== id)
-    setItems(list)
-    localStorage.setItem("cart", JSON.stringify(list))
+  function dec(id: string) {
+    const it = localItems.find((i) => i.id === id);
+    if (!it) return;
+    cart.update(id, it.quantity - 1);
   }
 
-  const total = items.reduce((sum, p) => sum + p.price * p.qty, 0)
+  function remove(id: string) {
+    cart.remove(id);
+  }
 
-  if (items.length === 0) {
-    return (
-      <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center justify-center">
-        <h1 className="text-3xl mb-4">Carrinho vazio</h1>
-        <Link to="/" className="bg-blue-500 px-4 py-2 rounded">
-          Voltar para a loja
-        </Link>
-      </div>
-    )
+  function clearAll() {
+    cart.clear();
+  }
+
+  function checkout() {
+    navigate("/checkout");
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-6">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-[#0f1a2b] text-slate-100 px-6 py-10">
+      <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Carrinho</h1>
 
-        <ul className="space-y-4 mb-6">
-          {items.map(item => (
-            <li
-              key={item.id}
-              className="bg-slate-800 p-4 rounded flex justify-between items-center"
-            >
-              <div className="flex items-center gap-4">
-                <img src={item.imageUrl} className="w-20 h-20 object-contain" />
-                <div>
-                  <div className="font-semibold">{item.name}</div>
-                  <div className="text-emerald-400">
-                    R$ {Number(item.price).toFixed(2)}
+        {cart.items.length === 0 ? (
+          <div className="bg-[#152238] border border-white/10 rounded-xl p-8 text-center">
+            Seu carrinho está vazio.
+            <div className="mt-4">
+              <Link to="/products" className="bg-blue-500 px-4 py-2 rounded">Ver produtos</Link>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-4">
+              {cart.items.map((it: any) => (
+                <div key={it.id} className="bg-[#152238] border border-white/10 rounded-xl p-4 flex items-center gap-4">
+                  <img src={it.imageUrl} alt={it.name} className="w-28 h-28 object-contain" />
+                  <div className="flex-1">
+                    <div className="font-semibold text-slate-100">{it.name}</div>
+                    <div className="text-slate-400 text-sm">{it.brand}</div>
+                    <div className="text-emerald-400 font-bold mt-2">R$ {(Number(it.price) * it.quantity).toFixed(2)}</div>
+                    <div className="mt-3 flex items-center gap-2">
+                      <button onClick={() => dec(it.id)} className="px-3 py-1 bg-white/5 rounded">-</button>
+                      <div className="px-3">{it.quantity}</div>
+                      <button onClick={() => inc(it.id)} className="px-3 py-1 bg-white/5 rounded">+</button>
+                      <button onClick={() => remove(it.id)} className="ml-4 text-sm text-red-500">Remover</button>
+                    </div>
                   </div>
                 </div>
+              ))}
+              <div className="flex justify-between items-center">
+                <button onClick={clearAll} className="bg-red-600 px-4 py-2 rounded">Limpar carrinho</button>
+                <div className="text-slate-300">Itens: {cart.count()}</div>
               </div>
+            </div>
 
-              <div className="flex items-center gap-3">
-                <input
-                  type="number"
-                  min="1"
-                  value={item.qty}
-                  onChange={e => updateQty(item.id, Number(e.target.value))}
-                  className="w-16 text-black text-center rounded"
-                />
-
-                <button
-                  onClick={() => removeItem(item.id)}
-                  className="bg-red-500 px-3 py-1 rounded text-white"
-                >
-                  Remover
-                </button>
+            <aside className="bg-[#152238] border border-white/10 rounded-xl p-6 h-fit">
+              <div className="text-slate-400">Resumo</div>
+              <div className="text-2xl font-bold text-emerald-400 mt-4">R$ {cart.total().toFixed(2)}</div>
+              <div className="mt-6">
+                <button onClick={checkout} className="w-full bg-blue-500 px-4 py-3 rounded-lg text-white font-semibold">Finalizar compra</button>
               </div>
-            </li>
-          ))}
-        </ul>
-
-        <div className="flex justify-between items-center text-xl font-bold">
-          <div>Total: R$ {total.toFixed(2)}</div>
-          <button className="bg-green-500 px-6 py-3 rounded text-white">
-            Finalizar Compra
-          </button>
-        </div>
+            </aside>
+          </div>
+        )}
       </div>
     </div>
-  )
+  );
 }

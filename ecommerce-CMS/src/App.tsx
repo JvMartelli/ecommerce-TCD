@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { Routes, Route } from "react-router-dom"
 import Home from "./store/Home"
 import Products from "./store/Products"
 import ProductDetail from "./store/ProductDetail"
@@ -13,19 +13,33 @@ import { ProductForm } from "./cases/products/components/product-form"
 import { AppSidebar } from "./components/layout/app-sidebar"
 import { SidebarProvider } from "./components/ui/sidebar"
 import { ToastContainer } from "react-toastify"
+import Navbar from "./components/layout/Navbar"
+import Checkout from "./store/Checkout"
+import Login from "./auth/Login"
+import Register from "./auth/Register"
+import ProtectedRoute from "./components/ProtectedRoute"
+
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <>
       <ToastContainer />
+      <Navbar />
 
       <Routes>
 
-        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        <Route index element={<Home />} />
         <Route path="/products" element={<Products />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/category/:id" element={<CategoryProducts />} />
-        <Route path="/cart" element={<Cart />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+        </Route>
 
         <Route
           path="/admin/*"
@@ -56,6 +70,6 @@ export default function App() {
         />
 
       </Routes>
-    </BrowserRouter>
+    </>
   )
 }

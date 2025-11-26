@@ -1,63 +1,57 @@
-import { useParams } from "react-router-dom"
-import { useEffect, useState } from "react"
-import { api } from "@/lib/axios"
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { api } from "@/lib/axios";
+import { useCart } from "@/hooks/useCart";
 
 export default function ProductDetail() {
-  const { id } = useParams()
-  const [product, setProduct] = useState<any | null>(null)
+  const { id } = useParams();
+  const cart = useCart();
+  const [product, setProduct] = useState<any>(null);
+  const [qty, setQty] = useState(1);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get(`/products/${id}`).then(res => setProduct(res.data || null))
-  }, [id])
+    if (!id) return;
+    setLoading(true);
+    api.get(`/products/${id}`).then((res) => setProduct(res.data)).finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) {
+    return <div className="min-h-screen bg-[#0f1a2b] p-10 max-w-6xl mx-auto"><div className="animate-pulse bg-[#152238] h-80 rounded-xl" /></div>;
+  }
 
   if (!product) {
-    return (
-      <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center">
-        Carregando...
-      </div>
-    )
+    return <div className="min-h-screen bg-[#0f1a2b] p-10 text-slate-300">Produto não encontrado.</div>;
   }
 
   function addToCart() {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]")
-    const item = cart.find((p: any) => p.id === product.id)
-
-    if (item) {
-      item.qty += 1
-    } else {
-      cart.push({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        imageUrl: product.imageUrl,
-        qty: 1
-      })
-    }
-
-    localStorage.setItem("cart", JSON.stringify(cart))
-    window.location.href = "/cart"
+    cart.add({ id: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl }, qty);
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-6">
-      <div className="max-w-4xl mx-auto flex gap-10">
-        <img src={product.imageUrl} className="w-80 h-80 object-contain" />
-        <div>
-          <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
-          <p className="mb-4">{product.description}</p>
+    <div className="min-h-screen bg-[#0f1a2b] text-slate-100 px-6 py-10">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="md:col-span-2 bg-[#152238] border border-white/10 rounded-xl p-6">
+          <img src={product.imageUrl} alt={product.name} className="w-full h-96 object-contain" />
+          <div className="mt-6 text-slate-200">{product.description}</div>
+        </div>
 
-          <div className="text-emerald-400 text-3xl font-bold mb-6">
-            R$ {Number(product.price).toFixed(2)}
+        <div className="bg-[#152238] border border-white/10 rounded-xl p-6">
+          <div className="text-2xl font-semibold">{product.name}</div>
+          <div className="text-blue-400 mt-1">{product.brand?.name}</div>
+          <div className="text-emerald-400 font-bold text-2xl mt-4">R$ {Number(product.price).toFixed(2)}</div>
+
+          <div className="mt-6 flex items-center gap-3">
+            <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-3 py-2 bg-white/5 rounded">-</button>
+            <div className="px-4">{qty}</div>
+            <button onClick={() => setQty(qty + 1)} className="px-3 py-2 bg-white/5 rounded">+</button>
           </div>
 
-          <button
-            onClick={addToCart}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded"
-          >
-            Adicionar ao carrinho
-          </button>
+          <button onClick={addToCart} className="w-full mt-6 bg-blue-500 hover:bg-blue-600 px-4 py-3 rounded-lg text-white font-semibold">Adicionar ao carrinho</button>
+
+          <div className="mt-6 text-sm text-slate-400">Categoria: {product.category?.name}</div>
         </div>
       </div>
     </div>
-  )
+  );
 }
