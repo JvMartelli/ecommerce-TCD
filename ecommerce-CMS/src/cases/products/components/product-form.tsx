@@ -1,20 +1,20 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { useProduct, useCreateProduct, useDeleteProduct, useUpdateProduct } from "../hooks/use-product";
-import { Input } from "@/components/ui/input";
-import type { ProductDTO } from "../dtos/product.dto";
-import { Textarea } from "@/components/ui/textarea";
+import { useNavigate, useParams } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { useProduct, useCreateProduct, useDeleteProduct, useUpdateProduct } from "../hooks/use-product"
+import { Input } from "@/components/ui/input"
+import type { ProductDTO } from "../dtos/product.dto"
+import { Textarea } from "@/components/ui/textarea"
 import { z } from "zod"
-import { useForm } from "react-hook-form";
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FormControl, Form, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { useCategories } from "@/cases/categories/hooks/use-category";
-import { useBrands } from "@/cases/brands/hooks/use-brand";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TabsContent } from "@radix-ui/react-tabs";
-import { SidebarForm } from "../../../components/layout/sidebar-form";
+import { FormControl, Form, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
+import { useCategories } from "@/cases/categories/hooks/use-category"
+import { useBrands } from "@/cases/brands/hooks/use-brand"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { TabsContent } from "@radix-ui/react-tabs"
+import { SidebarForm } from "../../../components/layout/sidebar-form"
 
 const formSchema = z.object({
   name: z.string().min(2).max(100),
@@ -24,18 +24,18 @@ const formSchema = z.object({
   categoryId: z.string().min(1),
   brandId: z.string().optional(),
   imageUrl: z.string().url()
-});
+})
 
 export function ProductForm() {
-  const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const { data, isLoading } = useProduct(id ?? "");
-  const createProduct = useCreateProduct();
-  const updateProduct = useUpdateProduct();
-  const deleteProduct = useDeleteProduct();
-  const { data: categories = [] } = useCategories();
-  const { data: brands = [] } = useBrands();
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate()
+  const { id } = useParams<{ id: string }>()
+  const { data, isLoading } = useProduct(id ?? "")
+  const createProduct = useCreateProduct()
+  const updateProduct = useUpdateProduct()
+  const deleteProduct = useDeleteProduct()
+  const { data: categories = [] } = useCategories()
+  const { data: brands = [] } = useBrands()
+  const [loading, setLoading] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -47,8 +47,8 @@ export function ProductForm() {
       categoryId: "",
       brandId: "",
       imageUrl: ""
-    },
-  });
+    }
+  })
 
   useEffect(() => {
     if (data) {
@@ -60,23 +60,23 @@ export function ProductForm() {
         categoryId: data.category?.id ?? "",
         brandId: data.brand?.id ?? "",
         imageUrl: data.imageUrl ?? ""
-      });
+      })
     }
-  }, [data, form]);
+  }, [data, form])
 
   function handleDelete() {
-    if (!id) return;
-    setLoading(true);
+    if (!id) return
+    setLoading(true)
     deleteProduct.mutate(id, {
       onSettled: () => {
-        navigate("/products");
-        setLoading(false);
-      },
-    });
+        navigate("/admin/products")
+        setLoading(false)
+      }
+    })
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
+    setLoading(true)
 
     const payload: ProductDTO = {
       name: values.name,
@@ -85,26 +85,26 @@ export function ProductForm() {
       active: values.active,
       imageUrl: values.imageUrl,
       category: { id: values.categoryId, name: "" },
-      brand: values.brandId ? { id: values.brandId, name: "" } : undefined,
-    };
+      brand: values.brandId ? { id: values.brandId, name: "" } : undefined
+    }
 
     if (id) {
       updateProduct.mutate(
         { id, product: payload },
         {
           onSettled: () => {
-            navigate("/products");
-            setLoading(false);
-          },
+            navigate("/admin/products")
+            setLoading(false)
+          }
         }
-      );
+      )
     } else {
       createProduct.mutate(payload, {
         onSettled: () => {
-          navigate("/products");
-          setLoading(false);
-        },
-      });
+          navigate("/admin/products")
+          setLoading(false)
+        }
+      })
     }
   }
 
@@ -122,8 +122,8 @@ export function ProductForm() {
               <TabsTrigger value="geral">Geral</TabsTrigger>
               <TabsTrigger value="description">Descrição</TabsTrigger>
             </TabsList>
-            <TabsContent value="geral" className="space-y-5">
 
+            <TabsContent value="geral" className="space-y-5">
               <FormField
                 control={form.control}
                 name="name"
@@ -158,10 +158,7 @@ export function ProductForm() {
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormLabel>Categoria</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Selecione uma categoria" />
@@ -169,7 +166,7 @@ export function ProductForm() {
                       </FormControl>
                       <SelectContent>
                         {categories.map(category => (
-                          <SelectItem key={category.id} value={category.id || ''}>
+                          <SelectItem key={category.id} value={category.id || ""}>
                             {category.name}
                           </SelectItem>
                         ))}
@@ -186,10 +183,7 @@ export function ProductForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Marca</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Selecione uma marca" />
@@ -197,7 +191,7 @@ export function ProductForm() {
                       </FormControl>
                       <SelectContent>
                         {brands.map(brand => (
-                          <SelectItem key={brand.id} value={brand.id || ''}>
+                          <SelectItem key={brand.id} value={brand.id || ""}>
                             {brand.name}
                           </SelectItem>
                         ))}
@@ -234,7 +228,6 @@ export function ProductForm() {
                   </FormItem>
                 )}
               />
-
             </TabsContent>
 
             <TabsContent value="description" className="space-y-5">
@@ -252,7 +245,6 @@ export function ProductForm() {
                 )}
               />
             </TabsContent>
-
           </Tabs>
         </form>
       </Form>
