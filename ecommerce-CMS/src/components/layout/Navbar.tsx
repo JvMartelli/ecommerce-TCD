@@ -1,51 +1,82 @@
-import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, Menu } from "lucide-react";
-import { useCart } from "@/contexts/CartContext";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom"
+import { ShoppingCart, Menu, User } from "lucide-react"
+import { useCart } from "@/contexts/CartContext"
+import { useState, useEffect, useRef } from "react"
 
 export default function Navbar() {
-  const { items } = useCart();
-  const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
+  const { items } = useCart()
+  const totalItems = items.reduce((acc, item) => acc + item.quantity, 0)
 
-  const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false)
+  const [menuUserOpen, setMenuUserOpen] = useState(false)
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const user = JSON.parse(localStorage.getItem("customer") || "null")
 
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    if (search.trim().length === 0) return;
-    navigate(`/products?search=${encodeURIComponent(search)}`);
-    setSearch("");
-    setOpen(false);
-  }
+  const menuRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuUserOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   return (
-    <nav className="bg-[#0f1a2b] border-b border-white/10 text-slate-100 px-6 py-4">
+    <nav className="bg-[#0f1a2b] border-b border-white/10 text-slate-100 px-6 py-4 relative z-[60]">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
 
-        
         <Link to="/" className="text-2xl font-bold text-blue-400">
           Spher Tek
         </Link>
 
-        
-        <form onSubmit={handleSearch} className="hidden md:flex items-center flex-1 justify-center px-6">
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar produtos..."
-            className="
-              bg-[#141e32] text-slate-200 px-4 py-2 rounded-xl
-              border border-white/10 w-96
-              focus:outline-none focus:border-blue-500 transition
-            "
-          />
-        </form>
-
-        
         <div className="hidden md:flex items-center gap-8 text-slate-200">
-          <Link to="/login" className="hover:text-blue-400 transition">Login</Link>
+
+          {user ? (
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setMenuUserOpen(!menuUserOpen)}
+                className="flex items-center gap-2 hover:text-blue-400 transition"
+              >
+                <User size={20} />
+                <span>{user.name.split(" ")[0]}</span>
+              </button>
+
+              <div
+                className={`
+                  absolute right-0 mt-2 w-56 bg-[#141e32]/90 backdrop-blur-md border border-white/10 rounded-xl shadow-xl p-2
+                  text-sm z-[70] transform transition-all duration-300 ease-out
+                  ${menuUserOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3 pointer-events-none"}
+                `}
+              >
+                <p className="px-3 py-2 text-slate-100 font-medium truncate">
+                  {user.name}
+                </p>
+
+                <p className="px-3 pb-2 text-slate-400 text-xs truncate mb-2 border-b border-white/10">
+                  {user.email}
+                </p>
+
+                <button
+                  onClick={() => {
+                    localStorage.removeItem("sb-user")
+                    localStorage.removeItem("customer")
+                    window.location.href = "/"
+                  }}
+                  className="w-full text-left px-3 py-2 text-red-400 hover:bg-red-500/10 rounded-lg"
+                >
+                  Sair
+                </button>
+              </div>
+            </div>
+          ) : (
+            <Link to="/login" className="hover:text-blue-400 transition">
+              Login
+            </Link>
+          )}
 
           <Link 
             to="/cart"
@@ -60,7 +91,6 @@ export default function Navbar() {
           </Link>
         </div>
 
-       
         <button 
           className="md:hidden text-slate-100"
           onClick={() => setOpen(!open)}
@@ -69,34 +99,32 @@ export default function Navbar() {
         </button>
       </div>
 
-      
       {open && (
         <div className="md:hidden flex flex-col gap-4 mt-4 pb-4 border-t border-white/10 pt-4 text-slate-200">
 
-          
-          <form onSubmit={handleSearch}>
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar produtos..."
-              className="
-                w-full bg-[#141e32] text-slate-200 px-4 py-2 rounded-xl
-                border border-white/10
-                focus:outline-none focus:border-blue-500 transition
-              "
-            />
-          </form>
+          {user ? (
+            <>
+              <p className="px-1 font-medium">{user.name}</p>
+              <p className="text-xs px-1 text-slate-400 -mt-3 mb-3">{user.email}</p>
 
-          <Link to="/login" onClick={() => setOpen(false)} className="hover:text-blue-400">
-            Login
-          </Link>
-
-          <Link to="/cart" onClick={() => setOpen(false)} className="hover:text-blue-400 flex items-center gap-2">
-            <ShoppingCart size={20} />
-            Carrinho ({totalItems})
-          </Link>
+              <button
+                onClick={() => {
+                  localStorage.removeItem("sb-user")
+                  localStorage.removeItem("customer")
+                  window.location.href = "/"
+                }}
+                className="text-red-400 text-left px-1 hover:text-red-300"
+              >
+                Sair
+              </button>
+            </>
+          ) : (
+            <Link to="/login" onClick={() => setOpen(false)} className="hover:text-blue-400">
+              Login
+            </Link>
+          )}
         </div>
       )}
     </nav>
-  );
+  )
 }

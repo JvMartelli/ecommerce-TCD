@@ -11,7 +11,7 @@ export default function HomeSidebar({
   setOpen: (v: boolean) => void
 }) {
   const location = useLocation()
-  const isLogged = !!localStorage.getItem("token") 
+  const isLogged = !!localStorage.getItem("sb-user")
 
   const menu = [
     { label: "Início", icon: Home, to: "/" },
@@ -32,7 +32,6 @@ export default function HomeSidebar({
         ${open ? "w-64" : "w-20"}
       `}
     >
-      {/* HEADER */}
       <div>
         <div className="flex items-center justify-between mb-8">
           <SpherTekIcon className="w-8 h-8 text-white" />
@@ -49,7 +48,6 @@ export default function HomeSidebar({
           </button>
         </div>
 
-        {/* MENU PRINCIPAL */}
         <nav className="flex flex-col gap-2">
           {menu.map((item, index) => {
             const Icon = item.icon
@@ -74,12 +72,12 @@ export default function HomeSidebar({
         </nav>
       </div>
 
-      {/* LOGIN / LOGOUT — FIXO NO RODAPÉ */}
       <div className="mb-4">
         {isLogged ? (
           <button
             onClick={() => {
-              localStorage.removeItem("token")
+              localStorage.removeItem("sb-user")
+              localStorage.removeItem("customer")
               window.location.href = "/"
             }}
             className={`

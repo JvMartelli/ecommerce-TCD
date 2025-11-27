@@ -9,27 +9,34 @@ export default function Checkout() {
   const [address, setAddress] = useState("")
   const [error, setError] = useState("")
 
+  const customer = JSON.parse(localStorage.getItem("customer") || "null")
+
   async function finishOrder() {
     if (!name || !address) {
       return setError("Preencha todos os campos.")
+    }
+
+    if (!customer) {
+      return setError("Você precisa estar logado.")
     }
 
     setLoading(true)
 
     try {
       await api.post("/orders", {
-        customerName: name,
+        customerId: customer.id,
         address,
-        items: items.map((i) => ({
+        items: items.map(i => ({
           productId: i.id,
           quantity: i.quantity,
           price: i.price
         })),
-        total: total()  
+        total: total()
       })
 
       clear()
-      alert("Pedido realizado com sucesso!")
+
+      window.location.href = "/"
     } catch {
       setError("Ocorreu um erro ao finalizar o pedido.")
     } finally {
@@ -70,7 +77,7 @@ export default function Checkout() {
             <h2 className="text-xl font-semibold mb-4">Itens do pedido</h2>
 
             <div className="space-y-4">
-              {items.map((item) => (
+              {items.map(item => (
                 <div key={item.id} className="flex items-center justify-between border-b border-white/10 pb-4">
                   <div>
                     <p className="font-medium">{item.name}</p>
