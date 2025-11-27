@@ -15,7 +15,7 @@ export function useBrand(id: string) {
     return useQuery<BrandDTO>({
         queryKey: ['brand', id],
         queryFn: () => BrandService.getById(id),
-        enabled: !!id //-> or Boolean(id)
+        enabled: !!id 
     });
 }
 

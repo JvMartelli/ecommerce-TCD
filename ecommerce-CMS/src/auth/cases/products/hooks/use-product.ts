@@ -15,7 +15,7 @@ export function useProduct(id: string) {
     return useQuery<ProductDTO>({
         queryKey: ['product', id],
         queryFn: () => ProductService.getById(id),
-        enabled: !!id //-> or Boolean(id)
+        enabled: !!id 
     });
 }
 

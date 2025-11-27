@@ -1,22 +1,16 @@
-import { Routes, Route } from "react-router-dom"
-
+import { Routes, Route, Outlet } from "react-router-dom"
 import Home from "./store/Home"
 import Products from "./store/Products"
 import ProductDetail from "./store/ProductDetail"
 import CategoryProducts from "./store/CategoryProducts"
 import Cart from "./store/Cart"
 import Checkout from "./store/Checkout"
-
 import Login from "./auth/Login"
 import Register from "./auth/Register"
 import ProtectedRoute from "./components/ProtectedRoute"
-
 import StoreLayout from "./components/layout/StoreLayout"
-
 import { ToastContainer } from "react-toastify"
-
-// ADMIN
-import { SidebarProvider } from "./components/ui/sidebar"
+import { SidebarProvider, Sidebar, SidebarInset } from "./components/ui/sidebar"
 import { AppSidebar } from "./components/layout/app-sidebar"
 import { CategoryLayout } from "./auth/cases/categories/components/category-layout"
 import { CategoryForm } from "./auth/cases/categories/components/category-form"
@@ -24,7 +18,7 @@ import { BrandLayout } from "./auth/cases/brands/components/brand-layout"
 import { BrandForm } from "./auth/cases/brands/components/brand-form"
 import { ProductLayout } from "./auth/cases/products/components/product-layout"
 import { ProductForm } from "./auth/cases/products/components/product-form"
-import { Outlet } from "react-router-dom"
+import Categories from "./store/Categories"
 
 export default function App() {
   return (
@@ -32,15 +26,14 @@ export default function App() {
       <ToastContainer />
 
       <Routes>
-        {/* LOGIN */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* STORE LAYOUT (sidebar em todas as páginas da loja) */}
         <Route element={<StoreLayout />}>
           <Route index element={<Home />} />
           <Route path="/products" element={<Products />} />
           <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/categories" element={<Categories />} />
           <Route path="/category/:id" element={<CategoryProducts />} />
 
           <Route element={<ProtectedRoute />}>
@@ -49,17 +42,16 @@ export default function App() {
           </Route>
         </Route>
 
-        {/* ADMIN */}
         <Route
           path="/admin"
           element={
             <SidebarProvider>
-              <div className="flex">
+              <Sidebar collapsible="icon">
                 <AppSidebar />
-                <div className="flex-1 p-6">
-                  <Outlet />
-                </div>
-              </div>
+              </Sidebar>
+              <SidebarInset>
+                <Outlet />
+              </SidebarInset>
             </SidebarProvider>
           }
         >

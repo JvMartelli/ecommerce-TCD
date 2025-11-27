@@ -15,7 +15,7 @@ export function useOrder(id: string) {
     return useQuery<OrderDTO>({
         queryKey: ['order', id],
         queryFn: () => OrderService.getById(id),
-        enabled: !!id //-> or Boolean(id)
+        enabled: !!id 
     });
 }
 

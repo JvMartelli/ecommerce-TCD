@@ -1,19 +1,28 @@
+import { useState } from "react"
 import { Outlet } from "react-router-dom"
 import HomeSidebar from "./HomeSidebar"
 import Navbar from "./Navbar"
 
 export default function StoreLayout() {
-  return (
-    <div className="flex">
-      <HomeSidebar />
+  const [open, setOpen] = useState(true)
 
-      <div className="flex-1 min-h-screen bg-[#0d1117] text-white">
+  return (
+    <>
+      <HomeSidebar open={open} setOpen={setOpen} />
+
+      <div
+        className={`
+          min-h-screen bg-[#0d1117] text-white
+          transition-all duration-300
+          ${open ? "pl-64" : "pl-20"}
+        `}
+      >
         <Navbar />
 
         <div className="pt-6 px-8">
           <Outlet />
         </div>
       </div>
-    </div>
+    </>
   )
 }
