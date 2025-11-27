@@ -1,174 +1,110 @@
-import { useEffect, useState } from "react";
-import { useCart } from "@/contexts/CartContext";
-import { useNavigate } from "react-router-dom";
+import { useCart } from "@/contexts/CartContext"
+import { useState } from "react"
+import { api } from "@/lib/axios"
 
 export default function Checkout() {
-  const cart = useCart();
-  const navigate = useNavigate();
+  const { items, total, clear } = useCart()
+  const [loading, setLoading] = useState(false)
+  const [name, setName] = useState("")
+  const [address, setAddress] = useState("")
+  const [error, setError] = useState("")
 
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    street: "",
-    number: "",
-    city: "",
-    state: "",
-    zip: "",
-    payment: "pix"
-  });
+  async function finishOrder() {
+    if (!name || !address) {
+      return setError("Preencha todos os campos.")
+    }
 
-  const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(false);
+    setLoading(true)
 
-  useEffect(() => {
-    if (cart.items.length === 0) navigate("/cart");
-  }, [cart.items, navigate]);
+    try {
+      await api.post("/orders", {
+        customerName: name,
+        address,
+        items: items.map((i) => ({
+          productId: i.id,
+          quantity: i.quantity,
+          price: i.price
+        })),
+        total: total()  
+      })
 
-  function handle(e: any) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
-
-  function finish() {
-    setLoading(true);
-    setTimeout(() => {
-      setDone(true);
-      cart.clear();
-      setTimeout(() => navigate("/"), 2000);
-    }, 1500);
-  }
-
-  if (done) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0f1a2b] text-slate-100 px-6">
-        <div className="bg-[#152238] border border-white/10 p-10 rounded-xl text-center max-w-md w-full">
-          <div className="text-2xl font-bold text-emerald-400">Compra concluída!</div>
-          <div className="mt-3 text-slate-300">Obrigado por comprar conosco!</div>
-          <div className="mt-4 text-sm text-slate-400">Redirecionando...</div>
-        </div>
-      </div>
-    );
+      clear()
+      alert("Pedido realizado com sucesso!")
+    } catch {
+      setError("Ocorreu um erro ao finalizar o pedido.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <div className="min-h-screen bg-[#0f1a2b] text-slate-100 px-6 py-10">
-      <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-10">
-        
+    <div className="min-h-screen bg-gradient-to-b from-[#0d1117] to-[#0b0e13] text-white px-6 py-12 flex justify-center">
+      <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-3 gap-10">
+
         <div className="lg:col-span-2 space-y-8">
-          
-          <div className="bg-[#152238] border border-white/10 p-6 rounded-xl">
-            <div className="text-xl font-semibold mb-4">Informações Pessoais</div>
+          <h1 className="text-4xl font-semibold mb-4">Finalizar Compra</h1>
+
+          <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-8 space-y-6">
+            <h2 className="text-xl font-semibold">Informações pessoais</h2>
 
             <input
-              name="name"
-              placeholder="Nome completo"
-              value={form.name}
-              onChange={handle}
-              className="w-full px-4 py-2 rounded-lg bg-[#0f1a2b] border border-white/10 text-slate-200 mb-3"
+              type="text"
+              placeholder="Seu nome completo"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-white/30"
             />
 
             <input
-              name="email"
-              type="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={handle}
-              className="w-full px-4 py-2 rounded-lg bg-[#0f1a2b] border border-white/10 text-slate-200"
+              type="text"
+              placeholder="Endereço completo"
+              value={address}
+              onChange={e => setAddress(e.target.value)}
+              className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-white/30"
             />
+
+            {error && <p className="text-red-400 text-sm">{error}</p>}
           </div>
 
-          <div className="bg-[#152238] border border-white/10 p-6 rounded-xl">
-            <div className="text-xl font-semibold mb-4">Endereço</div>
+          <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-8">
+            <h2 className="text-xl font-semibold mb-4">Itens do pedido</h2>
 
-            <input
-              name="street"
-              placeholder="Rua"
-              value={form.street}
-              onChange={handle}
-              className="w-full px-4 py-2 rounded-lg bg-[#0f1a2b] border border-white/10 text-slate-200 mb-3"
-            />
-
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <input
-                name="number"
-                placeholder="Número"
-                value={form.number}
-                onChange={handle}
-                className="px-4 py-2 rounded-lg bg-[#0f1a2b] border border-white/10 text-slate-200"
-              />
-
-              <input
-                name="zip"
-                placeholder="CEP"
-                value={form.zip}
-                onChange={handle}
-                className="px-4 py-2 rounded-lg bg-[#0f1a2b] border border-white/10 text-slate-200"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <input
-                name="city"
-                placeholder="Cidade"
-                value={form.city}
-                onChange={handle}
-                className="px-4 py-2 rounded-lg bg-[#0f1a2b] border border-white/10 text-slate-200"
-              />
-
-              <input
-                name="state"
-                placeholder="Estado"
-                value={form.state}
-                onChange={handle}
-                className="px-4 py-2 rounded-lg bg-[#0f1a2b] border border-white/10 text-slate-200"
-              />
+            <div className="space-y-4">
+              {items.map((item) => (
+                <div key={item.id} className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <div>
+                    <p className="font-medium">{item.name}</p>
+                    <p className="text-sm text-slate-400">Qtd: {item.quantity}</p>
+                  </div>
+                  <p className="font-semibold text-emerald-400">
+                    R$ {(item.price * item.quantity).toFixed(2)}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
-
-          <div className="bg-[#152238] border border-white/10 p-6 rounded-xl">
-            <div className="text-xl font-semibold mb-4">Pagamento</div>
-
-            <select
-              name="payment"
-              value={form.payment}
-              onChange={handle}
-              className="w-full px-4 py-2 rounded-lg bg-[#0f1a2b] border border-white/10 text-slate-200"
-            >
-              <option value="pix">PIX</option>
-              <option value="boleto">Boleto</option>
-              <option value="credit">Cartão de Crédito</option>
-            </select>
-          </div>
-
         </div>
 
-        <aside className="bg-[#152238] border border-white/10 p-6 rounded-xl h-fit">
-          <div className="text-xl font-semibold mb-4">Resumo</div>
+        <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-8 h-fit sticky top-10">
+          <h2 className="text-2xl font-semibold mb-6">Resumo</h2>
 
-          <div className="space-y-3">
-            {cart.items.map((i: any) => (
-              <div key={i.id} className="flex justify-between text-sm text-slate-300">
-                <div>{i.name} x{i.quantity}</div>
-                <div>R$ {(i.price * i.quantity).toFixed(2)}</div>
-              </div>
-            ))}
-          </div>
-
-          <div className="border-t border-white/10 mt-4 pt-4">
-            <div className="text-lg font-bold text-emerald-400">
-              Total: R$ {cart.total().toFixed(2)}
-            </div>
+          <div className="flex justify-between text-lg">
+            <span>Total</span>
+            <span className="font-bold text-emerald-400">
+              R$ {total().toFixed(2)}
+            </span>
           </div>
 
           <button
+            onClick={finishOrder}
             disabled={loading}
-            onClick={finish}
-            className="w-full mt-6 bg-blue-500 hover:bg-blue-600 px-4 py-3 rounded-lg text-white font-semibold disabled:opacity-40"
+            className="w-full mt-8 bg-white text-black font-semibold py-3 rounded-xl hover:bg-white/90 transition disabled:opacity-50"
           >
-            {loading ? "Processando..." : "Finalizar Compra"}
+            {loading ? "Processando..." : "Finalizar pedido"}
           </button>
-        </aside>
+        </div>
 
       </div>
     </div>
-  );
+  )
 }

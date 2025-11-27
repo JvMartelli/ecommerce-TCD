@@ -9,31 +9,36 @@ export function CategoryLayout() {
   const navigate = useNavigate()
 
   function handleCreate() {
-    navigate('/admin/categories/new')
+    navigate("/admin/categories/new")
   }
 
   return (
-    <div className="p-4">
+    <div className="p-6">
       <BreadCrumb title="Categorias" />
 
-      <div className="flex flex-col py-4 gap-4">
-        <div className="flex flex-row justify-end gap-4 my-4">
-          <InputGroup className="max-w-96">
-            <InputGroupInput placeholder="Search..." />
-            <InputGroupAddon>
-              <Search />
-            </InputGroupAddon>
-          </InputGroup>
-          <Button onClick={handleCreate}>
-            <Plus />
+      <div className="w-full flex flex-col gap-6 mt-6">
+        
+        
+        <div className="flex flex-col sm:flex-row justify-between gap-4 sm:items-center">
+          <div className="w-full sm:w-96">
+            <InputGroup>
+              <InputGroupInput placeholder="Buscar..." />
+              <InputGroupAddon>
+                <Search className="text-slate-400" />
+              </InputGroupAddon>
+            </InputGroup>
+          </div>
+
+          <Button onClick={handleCreate} className="flex items-center gap-2">
+            <Plus className="size-4" />
             Adicionar
           </Button>
         </div>
 
-        <div>
-          <CategoryDataTable />
-          <Outlet />
-        </div>
+        
+        <CategoryDataTable />
+
+        <Outlet />
       </div>
     </div>
   )

@@ -1,19 +1,16 @@
-import { DataTable } from "@/components/ui/data-table";
-import { categoryColumns } from "./category-columns";
-import { useCategories } from "../../hooks/use-category";
+import { categoryColumns } from "./category-columns"
+import { useCategories } from "../../hooks/use-category"
+import { AdminDataTable } from "@/components/admin/AdminDataTable"
+
 
 export function CategoryDataTable() {
+  const { data: categories, isLoading } = useCategories()
 
-    const {data: categories, isLoading} = useCategories();
-
-    return (
-        <div>
-            { isLoading ? (
-                <p>Carregando...</p>
-            ) : (
-                <DataTable columns={categoryColumns} data={categories!} />
-            )}
-        </div>
-
-    )
+  return (
+    <AdminDataTable
+      columns={categoryColumns}
+      data={categories || []}
+      isLoading={isLoading}
+    />
+  )
 }

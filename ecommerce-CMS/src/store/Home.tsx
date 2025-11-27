@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { api } from "@/lib/axios"
 
 export default function Home() {
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([])
+  const [categories, setCategories] = useState<any[]>([])
   const [products, setProducts] = useState<any[]>([])
 
   useEffect(() => {
@@ -12,40 +12,62 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-6">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Categorias</h1>
+    <>
+      <section className="text-center py-16">
+        <h1 className="text-5xl font-semibold">
+          Bem-vindo ao Futuro do Hardware
+        </h1>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-10">
-          {categories.map(c => (
-            <Link
-              to={`/category/${c.id}`}
-              key={c.id}
-              className="bg-slate-800 p-4 rounded-lg text-center hover:bg-slate-700"
-            >
-              {c.name}
-            </Link>
-          ))}
-        </div>
+        <p className="mt-4 text-slate-400 text-lg">
+          Componentes premium para montar a máquina dos seus sonhos.
+        </p>
 
-        <h2 className="text-2xl font-semibold mb-4">Produtos em destaque</h2>
+        <Link
+          to="/products"
+          className="inline-block mt-6 bg-white text-black px-6 py-3 rounded-xl font-medium"
+        >
+          Descobrir Produtos
+        </Link>
+      </section>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {products.map(p => (
-            <Link
-              to={`/product/${p.id}`}
-              key={p.id}
-              className="bg-slate-800 rounded-lg p-4"
-            >
-              <img src={p.imageUrl} className="w-full h-40 object-contain mb-3" />
-              <div className="font-semibold">{p.name}</div>
-              <div className="text-emerald-400 font-bold mt-2">
-                R$ {Number(p.price).toFixed(2)}
-              </div>
-            </Link>
-          ))}
-        </div>
+      <h2 className="text-3xl font-semibold mb-6">Categorias</h2>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 mb-12">
+        {categories.map(c => (
+          <Link
+            key={c.id}
+            to={`/category/${c.id}`}
+            className="bg-[#161b22] hover:bg-[#1b222c] rounded-xl p-6 text-center border border-white/5"
+          >
+            {c.name}
+          </Link>
+        ))}
       </div>
-    </div>
+
+      <h2 className="text-3xl font-semibold mb-6">Destaques Selecionados</h2>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-10 pb-14">
+        {products.map(p => (
+          <Link
+            key={p.id}
+            to={`/product/${p.id}`}
+            className="bg-[#161b22] hover:bg-[#1b222c] rounded-3xl p-6 border border-white/5 transition shadow-md hover:shadow-lg"
+          >
+            <img
+              src={p.imageUrl}
+              className="rounded-xl w-full h-52 object-contain mb-4"
+            />
+
+            <div className="text-slate-200 font-medium min-h-[48px]">
+              {p.name}
+            </div>
+
+            <div className="text-emerald-400 font-semibold text-lg mt-2">
+              R$ {Number(p.price).toFixed(2)}
+            </div>
+          </Link>
+        ))}
+      </div>
+    </>
   )
 }
