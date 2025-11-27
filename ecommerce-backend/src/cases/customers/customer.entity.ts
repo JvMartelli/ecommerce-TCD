@@ -5,6 +5,9 @@ export class Customer {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ nullable: false, unique: true })
+  supabaseId: string;
+
   @Column({ length: 120, nullable: false })
   name: string;
 

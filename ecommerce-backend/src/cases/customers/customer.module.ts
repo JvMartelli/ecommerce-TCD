@@ -9,5 +9,4 @@ import { Module } from '@nestjs/common';
   providers: [CustomerService],
   controllers: [CustomerController],
 })
-
 export class CustomerModule {}

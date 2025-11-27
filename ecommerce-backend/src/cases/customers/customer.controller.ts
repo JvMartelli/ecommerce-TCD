@@ -1,61 +1,69 @@
+import { 
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpException,
+  HttpStatus,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Put 
+} from "@nestjs/common";
 import { Customer } from "./customer.entity";
 import { CustomerService } from "./customer.service";
-import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, ParseUUIDPipe, Post, Put } from "@nestjs/common"
 
 @Controller('customers')
 export class CustomerController {
-    constructor(
-        private readonly service: CustomerService
-    ) {}
+  constructor(private readonly service: CustomerService) {}
 
-    @Get()
-    findAll(): Promise<Customer[]> {
-        return this.service.findAll();
-    }
+  @Get()
+  findAll(): Promise<Customer[]> {
+    return this.service.findAll();
+  }
 
-    @Get('/:id')
-    async findById(@Param('id', ParseUUIDPipe) id: string): Promise<Customer | null>{
-        const found = await this.service.findById(id);
+  @Get('/:id')
+  async findById(
+    @Param('id', ParseUUIDPipe) id: string
+  ): Promise<Customer | null> {
+    const found = await this.service.findById(id);
+    if (!found) throw new HttpException('Customer not found', HttpStatus.NOT_FOUND);
+    return found;
+  }
 
-        if (!found) {
-        throw new HttpException('Customer not found', HttpStatus.NOT_FOUND);
-        }
+  @Get('/by-supabase/:supabaseId')
+  async findBySupabase(
+    @Param('supabaseId') supabaseId: string
+  ): Promise<Customer | null> {
+    const found = await this.service.findBySupabaseId(supabaseId);
+    if (!found) throw new HttpException('Customer not found', HttpStatus.NOT_FOUND);
+    return found;
+  }
 
-        return found;
-    }
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  create(@Body() customer: Customer): Promise<Customer> {
+    return this.service.save(customer);
+  }
 
-    @Post()
-    @HttpCode(HttpStatus.CREATED)
-    create(@Body() Customer: Customer) :Promise<Customer> {
-        return this.service.save(Customer);
-    }
+  @Put('/:id')
+  @HttpCode(HttpStatus.OK)
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() customer: Customer
+  ): Promise<Customer> {
+    const found = await this.service.findById(id);
+    if (!found) throw new HttpException('Customer not found', HttpStatus.NOT_FOUND);
+    customer.id = id;
+    return this.service.save(customer);
+  }
 
-    @Put('/:id')
-    @HttpCode(HttpStatus.OK)
-    async update(
-        @Param('id', ParseUUIDPipe) id: string,
-        @Body() customer: Customer
-    ): Promise<Customer> {
-        const found = await this.service.findById(id);
-
-        if (!found) {
-        throw new HttpException('Customer not found', HttpStatus.NOT_FOUND);
-        }
-
-        customer.id = id;
-
-        return this.service.save(customer);
-    }
-
-    @Delete('/:id')
-    @HttpCode(HttpStatus.NO_CONTENT)
-    async delete(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
-        const found = await this.service.findById(id);
-
-        if (!found) {
-        throw new HttpException('Customer not found', HttpStatus.NOT_FOUND);
-        }
-
-        return this.service.remove(id);
-    }
+  @Delete('/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async delete(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    const found = await this.service.findById(id);
+    if (!found) throw new HttpException('Customer not found', HttpStatus.NOT_FOUND);
+    return this.service.remove(id);
+  }
 }

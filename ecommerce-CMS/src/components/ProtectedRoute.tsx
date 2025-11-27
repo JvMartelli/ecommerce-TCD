@@ -1,9 +1,9 @@
 import { Navigate, Outlet } from "react-router-dom";
 
 export default function ProtectedRoute() {
-  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("sb-user");
 
-  if (!token) {
+  if (!user) {
     return (
       <div className="min-h-screen bg-[#0f1a2b] text-slate-100 flex flex-col items-center justify-center p-6">
         <div className="bg-[#152238] p-6 border border-white/10 rounded-xl shadow text-center max-w-md">

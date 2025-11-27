@@ -1,27 +1,54 @@
-import { useState } from "react"
-import { api } from "@/lib/axios"
-import { useNavigate, Link } from "react-router-dom"
+import { useState } from "react";
+import { api } from "@/lib/axios";
+import { useNavigate, Link } from "react-router-dom";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function Login() {
-  const navigate = useNavigate()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setLoading(true)
-    setError("")
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
-      const res = await api.post("/auth/login", { email, password })
-      localStorage.setItem("token", res.data.token)
-      navigate("/")
+      
+      const { data, error: loginError } =
+        await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+      if (loginError) {
+        setError("Credenciais inválidas.");
+        setLoading(false);
+        return;
+      }
+
+      const user = data.user;
+
+      if (!user) {
+        setError("Erro ao autenticar usuário.");
+        setLoading(false);
+        return;
+      }
+
+      
+      const res = await api.get(`/customers/by-supabase/${user.id}`);
+
+      
+      localStorage.setItem("sb-user", JSON.stringify(user));
+      localStorage.setItem("customer", JSON.stringify(res.data));
+
+      navigate("/");
     } catch {
-      setError("Credenciais inválidas")
+      setError("Erro ao fazer login.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -68,5 +95,5 @@ export default function Login() {
         </p>
       </div>
     </div>
-  )
+  );
 }

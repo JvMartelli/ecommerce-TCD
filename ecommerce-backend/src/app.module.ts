@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
 import { CategoryModule } from './cases/categories/category.module';
 import { BrandModule } from './cases/brands/brand.module';
 import { ProductModule } from './cases/products/product.module';
 import { AuthModule } from './cases/auth/auth.module';
+import { CustomerModule } from './cases/customers/customer.module';
 
 @Module({
   imports: [
@@ -28,6 +28,7 @@ import { AuthModule } from './cases/auth/auth.module';
     CategoryModule,
     BrandModule,
     ProductModule,
+    CustomerModule
   ],
 })
 export class AppModule {}
