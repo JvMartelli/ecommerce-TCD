@@ -20,15 +20,17 @@ export default function Products() {
   }, [])
 
   useEffect(() => {
-    if (!search) {
+    if (!search.trim()) {
       setFiltered(products)
       return
     }
 
+    const s = search.trim()
+
     setFiltered(
       products.filter(p =>
-        p.name.toLowerCase().includes(search) ||
-        p.description?.toLowerCase().includes(search)
+        p.name.toLowerCase().includes(s) ||
+        p.description?.toLowerCase().includes(s)
       )
     )
   }, [search, products])
@@ -36,9 +38,18 @@ export default function Products() {
   return (
     <div className="min-h-screen px-6 py-10 text-white">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-semibold mb-10">
-          {search ? `Resultados para "${search}"` : "Produtos"}
-        </h1>
+        
+        <div className="flex items-center justify-between mb-10">
+          <h1 className="text-4xl font-semibold">
+            {search ? `Resultados para "${search}"` : "Produtos"}
+          </h1>
+
+          {search && (
+            <p className="text-slate-400 text-sm">
+              {filtered.length} resultado(s)
+            </p>
+          )}
+        </div>
 
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -46,6 +57,10 @@ export default function Products() {
               <div key={i} className="bg-[#161b22] rounded-2xl h-64 animate-pulse" />
             ))}
           </div>
+        ) : filtered.length === 0 ? (
+          <p className="text-slate-400 text-lg">
+            Nenhum produto encontrado para "{search}".
+          </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
             {filtered.map(p => (

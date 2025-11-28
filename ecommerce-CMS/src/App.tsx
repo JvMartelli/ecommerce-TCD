@@ -19,6 +19,7 @@ import { BrandForm } from "./auth/cases/brands/components/brand-form"
 import { ProductLayout } from "./auth/cases/products/components/product-layout"
 import { ProductForm } from "./auth/cases/products/components/product-form"
 import Categories from "./store/Categories"
+import Orders from "./store/Orders"
 
 export default function App() {
   return (
@@ -39,6 +40,7 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/orders" element={<Orders />} />
           </Route>
         </Route>
 

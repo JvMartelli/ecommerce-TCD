@@ -12,6 +12,8 @@ export default function Checkout() {
   const customer = JSON.parse(localStorage.getItem("customer") || "null")
 
   async function finishOrder() {
+    setError("")
+
     if (!name || !address) {
       return setError("Preencha todos os campos.")
     }
@@ -23,19 +25,20 @@ export default function Checkout() {
     setLoading(true)
 
     try {
-      await api.post("/orders", {
+      const payload = {
         customerId: customer.id,
-        address,
+        address: address,
+        total: total(),
         items: items.map(i => ({
           productId: i.id,
           quantity: i.quantity,
           price: i.price
-        })),
-        total: total()
-      })
+        }))
+      }
+
+      await api.post("/orders", payload)
 
       clear()
-
       window.location.href = "/"
     } catch {
       setError("Ocorreu um erro ao finalizar o pedido.")

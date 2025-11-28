@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom"
-import { ShoppingCart, Menu, User } from "lucide-react"
+import { ShoppingCart, Menu, User, PackageSearch, Search } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import { useState, useEffect, useRef } from "react"
 
@@ -9,6 +9,7 @@ export default function Navbar() {
 
   const [open, setOpen] = useState(false)
   const [menuUserOpen, setMenuUserOpen] = useState(false)
+  const [search, setSearch] = useState("")
 
   const navigate = useNavigate()
   const user = JSON.parse(localStorage.getItem("customer") || "null")
@@ -21,20 +22,40 @@ export default function Navbar() {
         setMenuUserOpen(false)
       }
     }
+
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault()
+    if (!search.trim()) return
+    navigate(`/products?search=${search.trim()}`)
+  }
+
   return (
     <nav className="bg-[#0f1a2b] border-b border-white/10 text-slate-100 px-6 py-4 relative z-[60]">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
 
         <Link to="/" className="text-2xl font-bold text-blue-400">
           Spher Tek
         </Link>
 
-        <div className="hidden md:flex items-center gap-8 text-slate-200">
+        <form
+          onSubmit={handleSearch}
+          className="hidden md:flex flex-1 max-w-lg items-center bg-white/10 border border-white/10 px-3 py-2 rounded-xl backdrop-blur-xl"
+        >
+          <Search size={18} className="text-slate-300 mr-2" />
+          <input
+            type="text"
+            placeholder="Buscar produto..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-transparent text-white outline-none placeholder:text-slate-400"
+          />
+        </form>
 
+        <div className="hidden md:flex items-center gap-8 text-slate-200">
           {user ? (
             <div className="relative" ref={menuRef}>
               <button
@@ -59,6 +80,17 @@ export default function Navbar() {
                 <p className="px-3 pb-2 text-slate-400 text-xs truncate mb-2 border-b border-white/10">
                   {user.email}
                 </p>
+
+                <button
+                  onClick={() => {
+                    setMenuUserOpen(false)
+                    navigate("/orders")
+                  }}
+                  className="w-full text-left px-3 py-2 flex items-center gap-2 hover:bg-white/10 rounded-lg text-blue-300"
+                >
+                  <PackageSearch size={16} />
+                  Meus pedidos
+                </button>
 
                 <button
                   onClick={() => {
@@ -102,10 +134,28 @@ export default function Navbar() {
       {open && (
         <div className="md:hidden flex flex-col gap-4 mt-4 pb-4 border-t border-white/10 pt-4 text-slate-200">
 
+          <form onSubmit={handleSearch} className="flex items-center bg-white/10 border border-white/10 px-3 py-2 rounded-xl backdrop-blur-xl">
+            <Search size={18} className="text-slate-300 mr-2" />
+            <input
+              type="text"
+              placeholder="Buscar produto..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-transparent text-white outline-none placeholder:text-slate-400"
+            />
+          </form>
+
           {user ? (
             <>
               <p className="px-1 font-medium">{user.name}</p>
               <p className="text-xs px-1 text-slate-400 -mt-3 mb-3">{user.email}</p>
+
+              <button
+                onClick={() => navigate("/orders")}
+                className="px-1 text-blue-300 hover:text-blue-200"
+              >
+                Meus pedidos
+              </button>
 
               <button
                 onClick={() => {
