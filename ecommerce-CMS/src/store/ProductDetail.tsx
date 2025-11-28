@@ -2,12 +2,16 @@ import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { api } from "@/lib/axios"
 import { useCart } from "@/contexts/CartContext"
+import { useFavorites } from "@/contexts/FavoriteContext"
+import { Heart } from "lucide-react"
 
 export default function ProductDetail() {
   const { id } = useParams()
   const [product, setProduct] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+
   const { add } = useCart()
+  const { isFavorite, toggleFavorite } = useFavorites()
 
   useEffect(() => {
     if (!id) return
@@ -21,10 +25,13 @@ export default function ProductDetail() {
     return <div className="text-center py-20 text-white">Carregando...</div>
   }
 
+  const favorite = isFavorite(product.id)
+
   return (
     <div className="min-h-screen px-6 py-10 text-white">
       <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12">
-        
+
+        {/* IMAGEM */}
         <div
           className="
             bg-[#161b22] rounded-2xl p-8 flex items-center justify-center
@@ -39,8 +46,25 @@ export default function ProductDetail() {
           />
         </div>
 
+        {/* INFO */}
         <div className="flex flex-col gap-6">
-          <h1 className="text-4xl font-semibold">{product.name}</h1>
+          <div className="flex items-start justify-between">
+            <h1 className="text-4xl font-semibold">{product.name}</h1>
+
+            {/* BOTÃO FAVORITAR */}
+            <button
+              onClick={() => toggleFavorite(product)}
+              className={`p-2 rounded-full transition 
+                ${favorite ? "text-red-500" : "text-slate-300 hover:text-red-400"}`}
+            >
+              <Heart
+                size={28}
+                className={`transition ${
+                  favorite ? "fill-red-500 scale-110" : "scale-100"
+                }`}
+              />
+            </button>
+          </div>
 
           <p className="text-slate-300">{product.description}</p>
 

@@ -22,7 +22,6 @@ export default function Navbar() {
         setMenuUserOpen(false)
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
@@ -31,6 +30,7 @@ export default function Navbar() {
     e.preventDefault()
     if (!search.trim()) return
     navigate(`/products?search=${search.trim()}`)
+    setOpen(false)
   }
 
   return (
@@ -41,6 +41,7 @@ export default function Navbar() {
           Spher Tek
         </Link>
 
+        {/* SEARCH DESKTOP */}
         <form
           onSubmit={handleSearch}
           className="hidden md:flex flex-1 max-w-lg items-center bg-white/10 border border-white/10 px-3 py-2 rounded-xl backdrop-blur-xl"
@@ -55,6 +56,7 @@ export default function Navbar() {
           />
         </form>
 
+        {/* DESKTOP MENU */}
         <div className="hidden md:flex items-center gap-8 text-slate-200">
           {user ? (
             <div className="relative" ref={menuRef}>
@@ -66,10 +68,12 @@ export default function Navbar() {
                 <span>{user.name.split(" ")[0]}</span>
               </button>
 
+              {/* DROPDOWN */}
               <div
                 className={`
-                  absolute right-0 mt-2 w-56 bg-[#141e32]/90 backdrop-blur-md border border-white/10 rounded-xl shadow-xl p-2
-                  text-sm z-[70] transform transition-all duration-300 ease-out
+                  absolute right-0 mt-2 w-56 bg-[#141e32]/90 backdrop-blur-md 
+                  border border-white/10 rounded-xl shadow-xl p-2 
+                  text-sm z-[70] transition-all duration-300 ease-out
                   ${menuUserOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3 pointer-events-none"}
                 `}
               >
@@ -83,8 +87,8 @@ export default function Navbar() {
 
                 <button
                   onClick={() => {
-                    setMenuUserOpen(false)
                     navigate("/orders")
+                    setMenuUserOpen(false)
                   }}
                   className="w-full text-left px-3 py-2 flex items-center gap-2 hover:bg-white/10 rounded-lg text-blue-300"
                 >
@@ -123,6 +127,7 @@ export default function Navbar() {
           </Link>
         </div>
 
+        {/* MOBILE MENU BUTTON */}
         <button 
           className="md:hidden text-slate-100"
           onClick={() => setOpen(!open)}
@@ -131,10 +136,15 @@ export default function Navbar() {
         </button>
       </div>
 
+      {/* MOBILE DROPDOWN */}
       {open && (
         <div className="md:hidden flex flex-col gap-4 mt-4 pb-4 border-t border-white/10 pt-4 text-slate-200">
 
-          <form onSubmit={handleSearch} className="flex items-center bg-white/10 border border-white/10 px-3 py-2 rounded-xl backdrop-blur-xl">
+          {/* MOBILE SEARCH */}
+          <form 
+            onSubmit={handleSearch}
+            className="flex items-center bg-white/10 border border-white/10 px-3 py-2 rounded-xl backdrop-blur-xl"
+          >
             <Search size={18} className="text-slate-300 mr-2" />
             <input
               type="text"
@@ -151,7 +161,10 @@ export default function Navbar() {
               <p className="text-xs px-1 text-slate-400 -mt-3 mb-3">{user.email}</p>
 
               <button
-                onClick={() => navigate("/orders")}
+                onClick={() => {
+                  navigate("/orders")
+                  setOpen(false)
+                }}
                 className="px-1 text-blue-300 hover:text-blue-200"
               >
                 Meus pedidos
@@ -169,7 +182,11 @@ export default function Navbar() {
               </button>
             </>
           ) : (
-            <Link to="/login" onClick={() => setOpen(false)} className="hover:text-blue-400">
+            <Link
+              to="/login"
+              onClick={() => setOpen(false)}
+              className="hover:text-blue-400"
+            >
               Login
             </Link>
           )}

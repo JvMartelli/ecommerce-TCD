@@ -7,6 +7,8 @@ import { ProductModule } from './cases/products/product.module';
 import { AuthModule } from './cases/auth/auth.module';
 import { CustomerModule } from './cases/customers/customer.module';
 import { OrderModule } from './cases/orders/order.module';
+import { FavoriteModule } from "./cases/favorites/favorite.module";
+
 
 @Module({
   imports: [
@@ -30,7 +32,9 @@ import { OrderModule } from './cases/orders/order.module';
     BrandModule,
     ProductModule,
     CustomerModule,
-    OrderModule
+    OrderModule,
+    FavoriteModule
+
   ],
 })
 export class AppModule {}
