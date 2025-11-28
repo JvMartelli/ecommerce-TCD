@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
 import { Customer } from "../customers/customer.entity";
 import { Product } from "../products/product.entity";
 
@@ -7,15 +7,11 @@ export class Favorite {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column()
-  customerId: string;
-
   @ManyToOne(() => Customer, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "customerId" })
   customer: Customer;
 
-  @Column()
-  productId: string;
-
   @ManyToOne(() => Product, { eager: true, onDelete: "CASCADE" })
+  @JoinColumn({ name: "productId" })
   product: Product;
 }

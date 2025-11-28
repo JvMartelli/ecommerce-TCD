@@ -11,8 +11,11 @@ export class FavoriteController {
   }
 
   @Post()
-  create(@Body() body: any) {
-    return this.service.create(body.customerId, body.productId);
+  create(
+    @Body("customerId") customerId: string,
+    @Body("productId") productId: string
+  ) {
+    return this.service.create(customerId, productId);
   }
 
   @Delete(":id")

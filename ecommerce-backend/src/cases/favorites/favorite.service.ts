@@ -12,19 +12,29 @@ export class FavoriteService {
 
   findByCustomer(customerId: string) {
     return this.repo.find({
-      where: { customerId },
-      relations: ["product"],
+      where: {
+        customer: { id: customerId }
+      },
+      relations: ["product"]
     });
   }
 
   async create(customerId: string, productId: string) {
     const existing = await this.repo.findOne({
-      where: { customerId, productId },
+      where: {
+        customer: { id: customerId },
+        product: { id: productId }
+      },
+      relations: ["product"]
     });
 
-    if (existing) return existing; // já favoritado
+    if (existing) return existing;
 
-    const fav = this.repo.create({ customerId, productId });
+    const fav = this.repo.create({
+      customer: { id: customerId },
+      product: { id: productId }
+    });
+
     return this.repo.save(fav);
   }
 
